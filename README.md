@@ -1,7 +1,7 @@
 Introduction
 ============
 
-This is a execution time profiling tool for Go projects.
+This is an execution time profiling tool for Go projects.
 
 Hot to use
 ==========
