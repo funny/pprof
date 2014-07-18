@@ -6,7 +6,7 @@ This is an execution time profiling/monitor tool for Go projects.
 Hot to use
 ==========
 
-Use `go install github.com/funny/tprof` command to install it into your project.
+Use `go get github.com/funny/tprof` command to install it into your project.
 
 And import `github.com/funny/tprof` in your code.
 
