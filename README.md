@@ -6,14 +6,14 @@ This is an execution time profiling/monitor tool for Go projects.
 Hot to use
 ==========
 
-Use `go get github.com/funny/tprof` command to install it into your project.
+Use `go get github.com/funny/care` command to install it into your project.
 
-And import `github.com/funny/tprof` in your code.
+And import `github.com/funny/care` in your code.
 
 Create a profiler for your application.
 
 ```go
-prof := tprof.New()
+recoder := care.NewTimeRecoder()
 ```
 
 And record execution time at any point, like request processing.
@@ -22,15 +22,15 @@ And record execution time at any point, like request processing.
 ```go
 t1 := time.Now()
 
-your_server.process(your_request)
+your_application.do_some_thing()
 
-prof.Record(your_request.Name, time.Since(t1))
+recoder.Record("do_some_thing", time.Since(t1))
 ```
 
 Save profiling result as a CSV file.
 
 ```go
-prof.SaveFile("tprof.csv")
+recoder.SaveFile("time.csv")
 ```
 
 The output
