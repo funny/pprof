@@ -10,29 +10,29 @@ import (
 	"time"
 )
 
-type P struct {
+type TimeRecoder struct {
 	mutex   sync.RWMutex
-	records map[string]*record
+	records map[string]*timeRecord
 }
 
-type record struct {
+type timeRecord struct {
 	Times         int64
 	TotalUsedTime time.Duration
 	MaxUsedTime   time.Duration
 	MinUsedTime   time.Duration
 }
 
-func New() *P {
-	return &P{
-		records: make(map[string]*record),
+func NewTimeRecoder() *TimeRecoder {
+	return &TimeRecoder{
+		records: make(map[string]*timeRecord),
 	}
 }
 
-func (p *P) Record(name string, usedTime time.Duration) {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
+func (tr *TimeRecoder) Record(name string, usedTime time.Duration) {
+	tr.mutex.Lock()
+	defer tr.mutex.Unlock()
 
-	var r, exists = p.records[name]
+	r, exists := tr.records[name]
 
 	if exists {
 		r.Times += 1
@@ -46,24 +46,24 @@ func (p *P) Record(name string, usedTime time.Duration) {
 			r.MinUsedTime = usedTime
 		}
 	} else {
-		r = &record{1, usedTime, usedTime, usedTime}
-		p.records[name] = r
+		r = &timeRecord{1, usedTime, usedTime, usedTime}
+		tr.records[name] = r
 	}
 }
 
-func (p *P) SaveFile(filename string) error {
+func (tr *TimeRecoder) SaveFile(filename string) error {
 	file, err := os.Create(filename)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	p.Save(file)
+	tr.Save(file)
 	return nil
 }
 
-func (p *P) Save(writer io.Writer) {
-	results := p.getRecords()
+func (tr *TimeRecoder) Save(writer io.Writer) {
+	results := tr.getRecords()
 	sort.Sort(results)
 
 	buf := bufio.NewWriter(writer)
@@ -88,14 +88,14 @@ func (p *P) Save(writer io.Writer) {
 	buf.Flush()
 }
 
-func (p *P) getRecords() resultList {
-	p.mutex.RLock()
-	defer p.mutex.RUnlock()
+func (tr *TimeRecoder) getRecords() sortTimeRecords {
+	tr.mutex.RLock()
+	defer tr.mutex.RUnlock()
 
-	results := make(resultList, 0, len(p.records))
+	results := make(sortTimeRecords, 0, len(tr.records))
 
-	for name, d := range p.records {
-		results = append(results, &result{
+	for name, d := range tr.records {
+		results = append(results, &sortTimeRecord{
 			Name:          name,
 			Times:         d.Times,
 			AvgUsedTime:   int64(d.TotalUsedTime) / d.Times,
@@ -108,7 +108,7 @@ func (p *P) getRecords() resultList {
 	return results
 }
 
-type result struct {
+type sortTimeRecord struct {
 	Name          string
 	Times         int64
 	AvgUsedTime   int64
@@ -117,16 +117,16 @@ type result struct {
 	TotalUsedTime int64
 }
 
-type resultList []*result
+type sortTimeRecords []*sortTimeRecord
 
-func (this resultList) Len() int {
+func (this sortTimeRecords) Len() int {
 	return len(this)
 }
 
-func (this resultList) Swap(i, j int) {
+func (this sortTimeRecords) Swap(i, j int) {
 	this[i], this[j] = this[j], this[i]
 }
 
-func (this resultList) Less(i, j int) bool {
+func (this sortTimeRecords) Less(i, j int) bool {
 	return this[i].AvgUsedTime > this[j].AvgUsedTime || (this[i].AvgUsedTime == this[j].AvgUsedTime && this[i].Times < this[j].Times)
 }
