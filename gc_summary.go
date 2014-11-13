@@ -11,10 +11,11 @@ import (
 var startTime = time.Now()
 
 func GCSummary(writer io.Writer) {
-	memStats := &runtime.MemStats{}
-	runtime.ReadMemStats(memStats)
-	gcstats := &debug.GCStats{PauseQuantiles: make([]time.Duration, 100)}
-	debug.ReadGCStats(gcstats)
+	memStats := runtime.MemStats{}
+	runtime.ReadMemStats(&memStats)
+
+	gcstats := debug.GCStats{PauseQuantiles: make([]time.Duration, 100)}
+	debug.ReadGCStats(&gcstats)
 
 	if gcstats.NumGC > 0 {
 		lastPause := gcstats.Pause[0]
