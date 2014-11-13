@@ -11,22 +11,22 @@ import (
 var startTime = time.Now()
 
 func GCSummary(writer io.Writer) {
-	memStats := runtime.MemStats{}
-	runtime.ReadMemStats(&memStats)
-
 	gcstats := debug.GCStats{PauseQuantiles: make([]time.Duration, 100)}
 	debug.ReadGCStats(&gcstats)
 
+	memStats := runtime.MemStats{}
+	runtime.ReadMemStats(&memStats)
+
+	elapsed := time.Now().Sub(startTime)
+	allocatedRate := float64(memStats.TotalAlloc) / elapsed.Seconds()
+
 	if gcstats.NumGC > 0 {
-		lastPause := gcstats.Pause[0]
-		elapsed := time.Now().Sub(startTime)
 		overhead := float64(gcstats.PauseTotal) / float64(elapsed) * 100
-		allocatedRate := float64(memStats.TotalAlloc) / elapsed.Seconds()
 
 		fmt.Fprintf(writer,
 			"NumGC: %d, LastPause: %v, Pause(Avg): %v, Overhead: %3.2f%%, Alloc: %s, Sys: %s, Alloc(Rate): %s/s, Histogram: %v %v %v\n",
 			gcstats.NumGC,
-			lastPause,
+			gcstats.Pause[0],
 			durationAvg(gcstats.Pause),
 			overhead,
 			readableSize(memStats.Alloc),
@@ -37,9 +37,6 @@ func GCSummary(writer io.Writer) {
 			gcstats.PauseQuantiles[99],
 		)
 	} else {
-		elapsed := time.Now().Sub(startTime)
-		allocatedRate := float64(memStats.TotalAlloc) / elapsed.Seconds()
-
 		fmt.Fprintf(writer,
 			"NumGC: 0, Alloc: %s, Sys:%s, Alloc(Rate): %s/s\n",
 			readableSize(memStats.Alloc),
