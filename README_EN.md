@@ -39,7 +39,7 @@ println(overall.GCSummaryColumns)
 println(summary.CSV())
 ```
 
-Some time you need to write into file：
+Some time you need to save into file：
 
 ```go
 
@@ -75,7 +75,7 @@ recoder.Record("do_some_thing", time.Since(t1))
 Save records into a CSV file.
 
 ```go
-recoder.SaveFile("time.csv")
+recoder.SaveCSV("time.csv")
 ```
 
 There have 6 fields in the CSV file.

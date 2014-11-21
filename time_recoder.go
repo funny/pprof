@@ -2,10 +2,10 @@ package overall
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"os"
 	"sort"
-	"strconv"
 	"sync"
 	"time"
 )
@@ -51,41 +51,41 @@ func (tr *TimeRecoder) Record(name string, usedTime time.Duration) {
 	}
 }
 
-func (tr *TimeRecoder) SaveFile(filename string) error {
+func (tr *TimeRecoder) SaveCSV(filename string) error {
 	file, err := os.Create(filename)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	tr.Save(file)
-	return nil
+	return tr.WriteCSV(file)
 }
 
-func (tr *TimeRecoder) Save(writer io.Writer) {
+func (tr *TimeRecoder) WriteCSV(writer io.Writer) error {
 	results := tr.getRecords()
 	sort.Sort(results)
 
 	buf := bufio.NewWriter(writer)
 
-	buf.WriteString("name,times,avg,min,max,total\n")
-
-	for _, r := range results {
-		buf.WriteString(r.Name)
-		buf.WriteByte(',')
-		buf.WriteString(strconv.FormatInt(r.Times, 10))
-		buf.WriteByte(',')
-		buf.WriteString(strconv.FormatInt(r.AvgUsedTime, 10))
-		buf.WriteByte(',')
-		buf.WriteString(strconv.FormatInt(r.MinUsedTime, 10))
-		buf.WriteByte(',')
-		buf.WriteString(strconv.FormatInt(r.MaxUsedTime, 10))
-		buf.WriteByte(',')
-		buf.WriteString(strconv.FormatInt(r.TotalUsedTime, 10))
-		buf.WriteByte('\n')
+	if _, err := fmt.Fprintln(writer, "name,times,avg,min,max,total"); err != nil {
+		return err
 	}
 
-	buf.Flush()
+	for _, r := range results {
+		if _, err := fmt.Fprintf(writer,
+			"%s,%d,%d,%d,%d,%d\n",
+			r.Name,
+			r.Times,
+			r.AvgUsedTime,
+			r.MinUsedTime,
+			r.MaxUsedTime,
+			r.TotalUsedTime,
+		); err != nil {
+			return err
+		}
+	}
+
+	return buf.Flush()
 }
 
 func (tr *TimeRecoder) getRecords() sortTimeRecords {

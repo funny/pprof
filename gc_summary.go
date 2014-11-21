@@ -68,8 +68,8 @@ func (summary *GCSummaryInfo) CSV() string {
 }
 
 // Write as humman readable format.
-func (summary *GCSummaryInfo) Write(writer io.Writer) {
-	fmt.Fprintf(writer,
+func (summary *GCSummaryInfo) Write(writer io.Writer) error {
+	_, err := fmt.Fprintf(writer,
 		"NumGC: %d, LastPause: %v, Pause(Avg): %v, Overhead: %3.2f%%, Alloc: %s, Sys: %s, Alloc(Rate): %s/s, Histogram: %v %v %v",
 		summary.NumGC,
 		summary.LastPause,
@@ -82,14 +82,15 @@ func (summary *GCSummaryInfo) Write(writer io.Writer) {
 		summary.Histogram2,
 		summary.Histogram3,
 	)
+	return err
 }
 
 // GC summary CSV column names.
 const GCSummaryColumns = "NumGC,LastPause,Pause(Avg),Overhead,Alloc,Sys,Alloc(Rate),Histogram1,Histogram2,Histogram3"
 
 // Write as CSV format.
-func (summary *GCSummaryInfo) WriteCSV(writer io.Writer) {
-	fmt.Fprintf(writer,
+func (summary *GCSummaryInfo) WriteCSV(writer io.Writer) error {
+	_, err := fmt.Fprintf(writer,
 		"%d,%d,%d,%3.2f,%d,%d,%d,%d,%d,%d",
 		summary.NumGC,
 		summary.LastPause,
@@ -102,6 +103,7 @@ func (summary *GCSummaryInfo) WriteCSV(writer io.Writer) {
 		summary.Histogram2,
 		summary.Histogram3,
 	)
+	return err
 }
 
 func durationAvg(items []time.Duration) time.Duration {

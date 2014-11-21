@@ -75,7 +75,7 @@ recoder.Record("do_some_thing", time.Since(t1))
 保存结果到CSV文件中。
 
 ```go
-recoder.SaveFile("time.csv")
+recoder.SaveCSV("time.csv")
 ```
 
 保存下来的CSV文件有以下六个字段：
