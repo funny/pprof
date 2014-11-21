@@ -10,10 +10,46 @@
 
 然后在你的代码中引用`github.com/funny/overall`。
 
-获取GC综合情况
-============
+GC综合情况
+=========
 
-只需要调用`overall.GCSummary(writer)`，就能获得当前应用的GC综合情况。
+GC综合状况用来监控程序的GC总体情况，保护GC暂停时间，内存申请量等。
+
+获取GC综合情况：
+
+```go
+summary := overall.GCSummary()
+```
+
+输出信息：
+
+```go
+
+// 方便阅读的格式
+println(summmary.String())
+
+
+// CSV格式
+println(summary.CSV())
+```
+
+输出CSV之前应该会用到CSV字段列表：
+
+```go
+println(overall.GCSummaryColumns)
+println(summary.CSV())
+```
+
+有时候会需要写入到文件：
+
+```go
+
+// 方便阅读的格式
+summary.Write(file)
+
+// CSV格式
+summary.WriteCSV(file)
+```
 
 监控执行时间
 ==========

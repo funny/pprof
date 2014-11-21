@@ -10,10 +10,45 @@ Use `go get github.com/funny/overall` command to install it into your project.
 
 And import `github.com/funny/overall` in your code.
 
-Get GC summary
-==============
+GC summary
+==========
 
-Just invoke `overall.GCSummary(writer)`, you will get the GC summary of your application.
+GC summary used to monitor GC status like GC pause time and allocation rate etc.
+
+Get GC summary:
+
+```go
+summary := overall.GCSummary()
+```
+
+Display GC summary：
+
+```go
+
+// Humman readable format
+println(summmary.String())
+
+// CSV format
+println(summary.CSV())
+```
+
+Some time you need to CSV column names：
+
+```go
+println(overall.GCSummaryColumns)
+println(summary.CSV())
+```
+
+Some time you need to write into file：
+
+```go
+
+// Humman readable format
+summary.Write(file)
+
+// CSV format
+summary.WriteCSV(file)
+```
 
 Monitor Execution Time
 ======================
