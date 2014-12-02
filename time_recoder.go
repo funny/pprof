@@ -83,7 +83,7 @@ func (tr *TimeRecoder) WriteCSV(writer io.Writer) error {
 			"%s,%d,%d,%d,%d,%d\n",
 			r.Name,
 			r.Times,
-			r.AvgUsedTime,
+			r.AvgUsedTime/r.Times,
 			r.MinUsedTime,
 			r.MaxUsedTime,
 			r.TotalUsedTime,
