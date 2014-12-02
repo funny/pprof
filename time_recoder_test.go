@@ -2,6 +2,7 @@ package overall
 
 import (
 	"bytes"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -44,6 +45,9 @@ func do_something(n int) int {
 	m := 0
 	for i := 0; i < n; i++ {
 		m += i
+		for j := 0; j < 30; j++ {
+			strconv.Itoa(m) // cost some CPU time
+		}
 	}
 	return m
 }

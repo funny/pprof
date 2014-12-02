@@ -7,6 +7,7 @@ import (
 	"os"
 	"sort"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -16,10 +17,12 @@ type TimeRecoder struct {
 }
 
 type timeRecord struct {
-	Times         int64
-	TotalUsedTime time.Duration
-	MaxUsedTime   time.Duration
-	MinUsedTime   time.Duration
+	Times int64 // total count
+
+	// The used time represents the elapsed time as an int64 nanosecond count.
+	TotalUsedTime int64
+	MaxUsedTime   int64
+	MinUsedTime   int64
 }
 
 func NewTimeRecoder() *TimeRecoder {
@@ -29,25 +32,29 @@ func NewTimeRecoder() *TimeRecoder {
 }
 
 func (tr *TimeRecoder) Record(name string, usedTime time.Duration) {
-	tr.mutex.Lock()
-	defer tr.mutex.Unlock()
-
-	r, exists := tr.records[name]
-
-	if exists {
-		r.Times += 1
-		r.TotalUsedTime += usedTime
-
-		if r.MaxUsedTime < usedTime {
-			r.MaxUsedTime = usedTime
+	usedTimeNano := int64(usedTime)
+	var r *timeRecord
+	{
+		tr.mutex.Lock()
+		defer tr.mutex.Unlock()
+		var exists bool
+		r, exists = tr.records[name]
+		if !exists {
+			r = &timeRecord{1, usedTimeNano, usedTimeNano, usedTimeNano}
+			tr.records[name] = r
+			return
 		}
+	}
 
-		if r.MinUsedTime > usedTime {
-			r.MinUsedTime = usedTime
-		}
-	} else {
-		r = &timeRecord{1, usedTime, usedTime, usedTime}
-		tr.records[name] = r
+	atomic.AddInt64(&r.Times, 1)
+	atomic.AddInt64(&r.TotalUsedTime, usedTimeNano)
+
+	if r.MaxUsedTime < usedTimeNano {
+		atomic.StoreInt64(&r.MaxUsedTime, usedTimeNano)
+	}
+
+	if r.MinUsedTime > usedTimeNano {
+		atomic.StoreInt64(&r.MinUsedTime, usedTimeNano)
 	}
 }
 
@@ -76,7 +83,7 @@ func (tr *TimeRecoder) WriteCSV(writer io.Writer) error {
 			"%s,%d,%d,%d,%d,%d\n",
 			r.Name,
 			r.Times,
-			r.AvgUsedTime,
+			r.AvgUsedTime/r.Times,
 			r.MinUsedTime,
 			r.MaxUsedTime,
 			r.TotalUsedTime,
