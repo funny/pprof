@@ -2,6 +2,7 @@ package overall
 
 import (
 	"bytes"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -11,26 +12,26 @@ func Test_TimeRecoder(t *testing.T) {
 
 	for i := 0; i < 10; i++ {
 		t := time.Now()
-		do_something(100)
-		recoder.Record("do_something(100)", time.Since(t))
+		doSomething(100)
+		recoder.Record("doSomething(100)", time.Since(t))
 	}
 
 	for i := 0; i < 10; i++ {
 		t := time.Now()
-		do_something(1000)
-		recoder.Record("do_something(1000)", time.Since(t))
+		doSomething(1000)
+		recoder.Record("doSomething(1000)", time.Since(t))
 	}
 
 	for i := 0; i < 10; i++ {
 		t := time.Now()
-		do_something(10000)
-		recoder.Record("do_something(10000)", time.Since(t))
+		doSomething(10000)
+		recoder.Record("doSomething(10000)", time.Since(t))
 	}
 
 	for i := 0; i < 10; i++ {
 		t := time.Now()
-		do_something(100000)
-		recoder.Record("do_something(100000)", time.Since(t))
+		doSomething(100000)
+		recoder.Record("doSomething(100000)", time.Since(t))
 	}
 
 	buffer := new(bytes.Buffer)
@@ -40,10 +41,13 @@ func Test_TimeRecoder(t *testing.T) {
 	println()
 }
 
-func do_something(n int) int {
+func doSomething(n int) int {
 	m := 0
 	for i := 0; i < n; i++ {
 		m += i
+		for j := 0; j < 30; j++ {
+			strconv.Itoa(m) // cost some CPU time
+		}
 	}
 	return m
 }
