@@ -39,14 +39,14 @@ func (tr *TimeRecoder) Record(name string, usedTime time.Duration) {
 
 	for {
 		old := atomic.LoadInt64(&r.MaxUsedTime)
-		if old > usedNano || atomic.CompareAndSwapInt64(&r.MaxUsedTime, old, usedNano) {
+		if old >= usedNano || atomic.CompareAndSwapInt64(&r.MaxUsedTime, old, usedNano) {
 			break
 		}
 	}
 
 	for {
 		old := atomic.LoadInt64(&r.MinUsedTime)
-		if old < usedNano || atomic.CompareAndSwapInt64(&r.MinUsedTime, old, usedNano) {
+		if old <= usedNano || atomic.CompareAndSwapInt64(&r.MinUsedTime, old, usedNano) {
 			break
 		}
 	}
