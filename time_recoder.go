@@ -7,6 +7,7 @@ import (
 	"os"
 	"sort"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -17,9 +18,9 @@ type TimeRecoder struct {
 
 type timeRecord struct {
 	Times         int64
-	TotalUsedTime time.Duration
-	MaxUsedTime   time.Duration
-	MinUsedTime   time.Duration
+	TotalUsedTime int64
+	MaxUsedTime   int64
+	MinUsedTime   int64
 }
 
 func NewTimeRecoder() *TimeRecoder {
@@ -29,26 +30,39 @@ func NewTimeRecoder() *TimeRecoder {
 }
 
 func (tr *TimeRecoder) Record(name string, usedTime time.Duration) {
+	r := tr.getRecord(name)
+
+	usedNano := usedTime.Nanoseconds()
+
+	atomic.AddInt64(&r.Times, 1)
+	atomic.AddInt64(&r.TotalUsedTime, usedNano)
+
+	for {
+		old := atomic.LoadInt64(&r.MaxUsedTime)
+		if old > usedNano || atomic.CompareAndSwapInt64(&r.MaxUsedTime, old, usedNano) {
+			break
+		}
+	}
+
+	for {
+		old := atomic.LoadInt64(&r.MinUsedTime)
+		if old < usedNano || atomic.CompareAndSwapInt64(&r.MinUsedTime, old, usedNano) {
+			break
+		}
+	}
+}
+
+func (tr *TimeRecoder) getRecord(name string) *timeRecord {
 	tr.mutex.Lock()
 	defer tr.mutex.Unlock()
 
 	r, exists := tr.records[name]
-
-	if exists {
-		r.Times += 1
-		r.TotalUsedTime += usedTime
-
-		if r.MaxUsedTime < usedTime {
-			r.MaxUsedTime = usedTime
-		}
-
-		if r.MinUsedTime > usedTime {
-			r.MinUsedTime = usedTime
-		}
-	} else {
-		r = &timeRecord{1, usedTime, usedTime, usedTime}
+	if !exists {
+		r = new(timeRecord)
 		tr.records[name] = r
 	}
+
+	return r
 }
 
 func (tr *TimeRecoder) SaveCSV(filename string) error {
@@ -98,10 +112,10 @@ func (tr *TimeRecoder) getRecords() sortTimeRecords {
 		results = append(results, &sortTimeRecord{
 			Name:          name,
 			Times:         d.Times,
-			AvgUsedTime:   int64(d.TotalUsedTime) / d.Times,
-			MaxUsedTime:   int64(d.MaxUsedTime),
-			MinUsedTime:   int64(d.MinUsedTime),
-			TotalUsedTime: int64(d.TotalUsedTime),
+			AvgUsedTime:   d.TotalUsedTime / d.Times,
+			MaxUsedTime:   d.MaxUsedTime,
+			MinUsedTime:   d.MinUsedTime,
+			TotalUsedTime: d.TotalUsedTime,
 		})
 	}
 
