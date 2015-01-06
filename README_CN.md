@@ -54,12 +54,12 @@ summary.WriteCSV(file)
 监控执行时间
 ==========
 
-`TimeRecoder`可以帮助你监控API或者函数的执行时间。
+`TimeRecorder`可以帮助你监控API或者函数的执行时间。
 
-首先你需要实例化`TimeRecoder`。
+首先你需要实例化`TimeRecorder`。
 
 ```go
-recoder := overall.NewTimeRecoder()
+recoder := overall.NewTimeRecorder()
 ```
 
 然后在任意地方记录执行时间。

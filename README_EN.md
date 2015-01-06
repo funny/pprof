@@ -53,12 +53,12 @@ summary.WriteCSV(file)
 Monitor Execution Time
 ======================
 
-The `TimeRecoder` helps you to monitor execution time of APIs or functions.
+The `TimeRecorder` helps you to monitor execution time of APIs or functions.
 
-First you need to a `TimeRecoder` instance.
+First you need to a `TimeRecorder` instance.
 
 ```go
-recoder := overall.NewTimeRecoder()
+recoder := overall.NewTimeRecorder()
 ```
 
 Then record execution time at any where you want.
