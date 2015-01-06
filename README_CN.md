@@ -59,7 +59,7 @@ summary.WriteCSV(file)
 首先你需要实例化`TimeRecorder`。
 
 ```go
-recoder := overall.NewTimeRecorder()
+recorder := overall.NewTimeRecorder()
 ```
 
 然后在任意地方记录执行时间。
@@ -69,13 +69,13 @@ t1 := time.Now()
 
 your_application.do_some_thing()
 
-recoder.Record("do_some_thing", time.Since(t1))
+recorder.Record("do_some_thing", time.Since(t1))
 ```
 
 保存结果到CSV文件中。
 
 ```go
-recoder.SaveCSV("time.csv")
+recorder.SaveCSV("time.csv")
 ```
 
 保存下来的CSV文件有以下六个字段：
