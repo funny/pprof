@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-type TimeRecoder struct {
+type TimeRecorder struct {
 	mutex   sync.RWMutex
 	records map[string]*timeRecord
 }
@@ -23,13 +23,13 @@ type timeRecord struct {
 	MinUsedTime   int64
 }
 
-func NewTimeRecoder() *TimeRecoder {
-	return &TimeRecoder{
+func NewTimeRecorder() *TimeRecorder {
+	return &TimeRecorder{
 		records: make(map[string]*timeRecord),
 	}
 }
 
-func (tr *TimeRecoder) Record(name string, usedTime time.Duration) {
+func (tr *TimeRecorder) Record(name string, usedTime time.Duration) {
 	r := tr.getRecord(name)
 
 	usedNano := usedTime.Nanoseconds()
@@ -52,7 +52,7 @@ func (tr *TimeRecoder) Record(name string, usedTime time.Duration) {
 	}
 }
 
-func (tr *TimeRecoder) getRecord(name string) *timeRecord {
+func (tr *TimeRecorder) getRecord(name string) *timeRecord {
 	tr.mutex.Lock()
 	defer tr.mutex.Unlock()
 
@@ -65,7 +65,7 @@ func (tr *TimeRecoder) getRecord(name string) *timeRecord {
 	return r
 }
 
-func (tr *TimeRecoder) SaveCSV(filename string) error {
+func (tr *TimeRecorder) SaveCSV(filename string) error {
 	file, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -75,7 +75,7 @@ func (tr *TimeRecoder) SaveCSV(filename string) error {
 	return tr.WriteCSV(file)
 }
 
-func (tr *TimeRecoder) WriteCSV(writer io.Writer) error {
+func (tr *TimeRecorder) WriteCSV(writer io.Writer) error {
 	results := tr.getRecords()
 	sort.Sort(results)
 
@@ -102,7 +102,7 @@ func (tr *TimeRecoder) WriteCSV(writer io.Writer) error {
 	return buf.Flush()
 }
 
-func (tr *TimeRecoder) getRecords() sortTimeRecords {
+func (tr *TimeRecorder) getRecords() sortTimeRecords {
 	tr.mutex.RLock()
 	defer tr.mutex.RUnlock()
 

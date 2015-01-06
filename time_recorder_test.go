@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-func Test_TimeRecoder(t *testing.T) {
-	recoder := NewTimeRecoder()
+func Test_TimeRecorder(t *testing.T) {
+	recoder := NewTimeRecorder()
 
 	for i := 0; i < 10; i++ {
 		t := time.Now()
