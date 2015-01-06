@@ -53,12 +53,12 @@ summary.WriteCSV(file)
 Monitor Execution Time
 ======================
 
-The `TimeRecoder` helps you to monitor execution time of APIs or functions.
+The `TimeRecorder` helps you to monitor execution time of APIs or functions.
 
-First you need to a `TimeRecoder` instance.
+First you need to a `TimeRecorder` instance.
 
 ```go
-recoder := overall.NewTimeRecoder()
+recorder := overall.NewTimeRecorder()
 ```
 
 Then record execution time at any where you want.
@@ -69,13 +69,13 @@ t1 := time.Now()
 
 your_application.do_some_thing()
 
-recoder.Record("do_some_thing", time.Since(t1))
+recorder.Record("do_some_thing", time.Since(t1))
 ```
 
 Save records into a CSV file.
 
 ```go
-recoder.SaveCSV("time.csv")
+recorder.SaveCSV("time.csv")
 ```
 
 There have 6 fields in the CSV file.
