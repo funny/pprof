@@ -70,7 +70,7 @@ func (summary *GCSummaryInfo) CSV() string {
 // Write as humman readable format.
 func (summary *GCSummaryInfo) Write(writer io.Writer) error {
 	_, err := fmt.Fprintf(writer,
-		"NumGC: %d, LastPause: %v, Pause(Avg): %v, Overhead: %3.2f%%, Alloc: %s, Sys: %s, Alloc(Rate): %s/s, Histogram: %v %v %v",
+		"NumGC: %d, LastPause: %v, Pause(Avg): %v, Overhead: %3.2f%%, Alloc: %s, Sys: %s, Alloc(Rate): %s/s, Histogram: %v %v %v\n",
 		summary.NumGC,
 		summary.LastPause,
 		summary.PauseAvg,
@@ -91,7 +91,7 @@ const GCSummaryColumns = "NumGC,LastPause,Pause(Avg),Overhead,Alloc,Sys,Alloc(Ra
 // Write as CSV format.
 func (summary *GCSummaryInfo) WriteCSV(writer io.Writer) error {
 	_, err := fmt.Fprintf(writer,
-		"%d,%d,%d,%3.2f,%d,%d,%d,%d,%d,%d",
+		"%d,%d,%d,%3.2f,%d,%d,%d,%d,%d,%d\n",
 		summary.NumGC,
 		summary.LastPause,
 		summary.PauseAvg,
