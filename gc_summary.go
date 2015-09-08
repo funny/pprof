@@ -4,12 +4,23 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"os"
 	"runtime"
 	"runtime/debug"
 	"time"
 )
 
 var startTime = time.Now()
+
+// Shorthand for GCSummary().Save(file)
+func SaveGCSummary(file string) error {
+	return GCSummary().Save(file)
+}
+
+// Shorthand for GCSummary().SaveCSV(file)
+func SaveGCSummaryGCV(file string) error {
+	return GCSummary().SaveCSV(file)
+}
 
 type GCSummaryInfo struct {
 	NumGC      int64
@@ -25,7 +36,7 @@ type GCSummaryInfo struct {
 }
 
 // Get GC summary.
-func GCSummary() GCSummaryInfo {
+func GCSummary() *GCSummaryInfo {
 	gcstats := debug.GCStats{PauseQuantiles: make([]time.Duration, 100)}
 	debug.ReadGCStats(&gcstats)
 
@@ -34,7 +45,7 @@ func GCSummary() GCSummaryInfo {
 
 	elapsed := time.Now().Sub(startTime)
 
-	summary := GCSummaryInfo{
+	summary := &GCSummaryInfo{
 		Alloc:     memStats.Alloc,
 		Sys:       memStats.Sys,
 		AllocRate: uint64(float64(memStats.TotalAlloc) / elapsed.Seconds()),
@@ -85,6 +96,16 @@ func (summary *GCSummaryInfo) Write(writer io.Writer) error {
 	return err
 }
 
+// Save as human readable file.
+func (summary *GCSummaryInfo) Save(file string) error {
+	f, err := os.Create(file)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	return summary.Write(f)
+}
+
 // GC summary CSV column names.
 const GCSummaryColumns = "NumGC,LastPause,Pause(Avg),Overhead,Alloc,Sys,Alloc(Rate),Histogram1,Histogram2,Histogram3"
 
@@ -104,6 +125,16 @@ func (summary *GCSummaryInfo) WriteCSV(writer io.Writer) error {
 		summary.Histogram3,
 	)
 	return err
+}
+
+// Save as CSV file.
+func (summary *GCSummaryInfo) SaveCSV(file string) error {
+	f, err := os.Create(file)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	return summary.WriteCSV(f)
 }
 
 func durationAvg(items []time.Duration) time.Duration {
