@@ -1,14 +1,14 @@
 Introduction
 ============
 
-This package helps you to monitor overall situation of your Go application.
+This package helps you to monitor pprof situation of your Go application.
 
 Install
 =======
 
-Use `go get github.com/funny/overall` command to install it into your project.
+Use `go get github.com/funny/pprof` command to install it into your project.
 
-And import `github.com/funny/overall` in your code.
+And import `github.com/funny/pprof` in your code.
 
 GC summary
 ==========
@@ -18,7 +18,7 @@ GC summary used to monitor GC status like GC pause time and allocation rate etc.
 Get GC summary:
 
 ```go
-summary := overall.GCSummary()
+summary := pprof.GCSummary()
 ```
 
 Display GC summary：
@@ -35,7 +35,7 @@ println(summary.CSV())
 Some time you need to CSV column names：
 
 ```go
-println(overall.GCSummaryColumns)
+println(pprof.GCSummaryColumns)
 println(summary.CSV())
 ```
 
@@ -58,7 +58,7 @@ The `TimeRecorder` helps you to monitor execution time of APIs or functions.
 First you need to a `TimeRecorder` instance.
 
 ```go
-recorder := overall.NewTimeRecorder()
+recorder := pprof.NewTimeRecorder()
 ```
 
 Then record execution time at any where you want.

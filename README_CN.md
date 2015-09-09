@@ -6,9 +6,9 @@
 安装
 ====
 
-使用`go get github.com/funny/overall`命令把本项目安装到本地.
+使用`go get github.com/funny/pprof`命令把本项目安装到本地.
 
-然后在你的代码中引用`github.com/funny/overall`。
+然后在你的代码中引用`github.com/funny/pprof`。
 
 GC综合情况
 =========
@@ -18,7 +18,7 @@ GC综合状况用来监控程序的GC总体情况，保护GC暂停时间，内�
 获取GC综合情况：
 
 ```go
-summary := overall.GCSummary()
+summary := pprof.GCSummary()
 ```
 
 输出信息：
@@ -36,7 +36,7 @@ println(summary.CSV())
 输出CSV之前应该会用到CSV字段列表：
 
 ```go
-println(overall.GCSummaryColumns)
+println(pprof.GCSummaryColumns)
 println(summary.CSV())
 ```
 
@@ -59,7 +59,7 @@ summary.WriteCSV(file)
 首先你需要实例化`TimeRecorder`。
 
 ```go
-recorder := overall.NewTimeRecorder()
+recorder := pprof.NewTimeRecorder()
 ```
 
 然后在任意地方记录执行时间。

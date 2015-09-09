@@ -1,4 +1,4 @@
-package overall
+package pprof
 
 import (
 	"bytes"
